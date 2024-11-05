@@ -71,6 +71,14 @@
             font-size: 20px;
         }
 
+        .call-button.active {
+            background: #e74c3c; /* Red highlight when active */
+        }
+
+        .call-button.completed {
+            background: #7f8c8d; /* Return to original color when done */
+        }
+
         .elevator-shaft {
             position: absolute;
             width: var(--elevator-width);
@@ -88,7 +96,7 @@
             bottom: 5px;
             background: #95a5a6;
             border-radius: 5px;
-            transition: bottom 0.1s linear; /* Smaller transition time for smoother updates */
+            transition: bottom 1s linear; /* Constant speed transition */
         }
 
         .doors {
@@ -300,6 +308,35 @@
             }, DOOR_OPERATION_TIME);
         }
 
+        function moveElevator(targetFloor) {
+            const buttons = document.querySelectorAll('.call-button');
+            const elevator = document.querySelector('.elevator');
+            
+            // Highlight selected button
+            buttons.forEach(button => {
+                if (button.textContent == targetFloor) {
+                    button.classList.add('active');
+                }
+            });
+
+            // Calculate new position
+            const newPosition = (targetFloor - 1) * 100; // Assuming 100px per floor
+            elevator.style.bottom = `${newPosition}px`;
+
+            // Remove highlight when animation completes
+            elevator.addEventListener('transitionend', function() {
+                buttons.forEach(button => {
+                    button.classList.remove('active');
+                });
+            }, { once: true });
+        }
+        // Update click handlers to call moveElevator directly
+        document.querySelectorAll('.call-button').forEach(button => {
+            button.addEventListener('click', () => {
+                moveElevator(button.textContent);
+            });
+        });
+        
         // Update initial floor display
         updateFloorDisplays(currentFloor, null);
         updateElevatorPosition(currentFloor);

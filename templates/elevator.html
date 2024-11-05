@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elevator Prototype</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="d-flex flex-column justify-content-center align-items-center vh-100">
+    <div class="container">
+        <div class="row">
+            <div class="col-8 building">
+                <div class="floor" style="top: 0;">Floor 3</div>
+                <div class="floor" style="top: 100px;">Floor 2</div>
+                <div class="floor" style="top: 200px;">Floor 1</div>
+                <div class="floor" style="top: 300px;">Ground Floor</div>
+            </div>
+            <div class="col-4 d-flex flex-column align-items-center">
+                <div class="elevator-container">
+                    <div class="elevator">
+                        <div class="door left"></div>
+                        <div class="door right"></div>
+                    </div>
+                </div>
+                <div class="buttons mt-4">
+                    <div class="btn btn-secondary m-1" onclick="moveToFloor(3)">3</div>
+                    <div class="btn btn-secondary m-1" onclick="moveToFloor(2)">2</div>
+                    <div class="btn btn-secondary m-1" onclick="moveToFloor(1)">1</div>
+                    <div class="btn btn-secondary m-1" onclick="moveToFloor(0)">G</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function moveToFloor(floor) {
+            const elevator = document.querySelector('.elevator');
+            const doors = document.querySelectorAll('.door');
+            const floors = [300, 200, 100, 0]; // Positions for each floor
+
+            // Close doors
+            doors.forEach(door => door.style.width = '50%');
+
+            setTimeout(() => {
+                // Move elevator
+                elevator.style.transform = `translateY(-${floors[floor]}px)`;
+
+                setTimeout(() => {
+                    // Open doors
+                    doors.forEach(door => door.style.width = '0');
+                }, 1000); // Wait for elevator to reach the floor
+            }, 1000); // Wait for doors to close
+        }
+    </script>
+</body>
+</html>

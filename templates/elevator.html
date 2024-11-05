@@ -8,6 +8,8 @@
         :root {
             --button-size: 70px;
             --led-color: #ff0000;
+            --elevator-width: 40vw;
+            --elevator-height: 90vh;
         }
 
         body {
@@ -21,9 +23,31 @@
             padding: 20px;
         }
 
+        .elevator-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .display-panel {
+            background: #000;
+            color: var(--led-color);
+            padding: 20px 40px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Digital', monospace;
+            font-size: 48px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
         .elevator-shaft {
-            height: 90vh;
-            width: 60vw;
+            height: var(--elevator-height);
+            width: var(--elevator-width);
             background: #34495e;
             position: relative;
             border-radius: 10px;
@@ -36,14 +60,18 @@
             position: relative;
             background: #95a5a6;
             border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .doors {
-            width: 100%;
-            height: 100%;
+            width: 90%;
+            height: 98%;
             position: relative;
             overflow: hidden;
-            border-radius: 10px;
+            border-radius: 8px;
+            margin: auto;
         }
 
         .door {
@@ -52,6 +80,7 @@
             background: linear-gradient(145deg, #7f8c8d, #95a5a6);
             position: absolute;
             transition: transform 0.8s ease-in-out;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
         }
 
         .door.left {
@@ -72,34 +101,35 @@
             transform: scaleX(0);
         }
 
-        .elevator-panel {
-            background: linear-gradient(145deg, #2c3e50, #34495e);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 
-                0 0 20px rgba(0,0,0,0.5),
-                inset 0 0 15px rgba(0,0,0,0.5);
-            width: 300px;
-        }
-
-        .display-panel {
-            background: #000;
-            color: var(--led-color);
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 8px;
-            text-align: center;
-            font-family: 'Digital', monospace;
-            font-size: 36px;
-            position: relative;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-        }
-
-        .direction-arrows {
+        .control-panel {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             gap: 20px;
-            margin-top: 10px;
+        }
+
+        .direction-button {
+            width: var(--button-size);
+            height: var(--button-size);
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(145deg, #e6e6e6, #ffffff);
+            box-shadow: 
+                4px 4px 8px rgba(0,0,0,0.3),
+                -4px -4px 8px rgba(255,255,255,0.1);
+            cursor: pointer;
+            font-size: 32px;
+            color: #333;
+            transition: all 0.2s;
+        }
+
+        .direction-button:active {
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+            transform: scale(0.95);
+        }
+
+        .direction-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .arrow {
@@ -122,51 +152,10 @@
         .arrow.active {
             opacity: 1;
         }
-
-        .elevator-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            justify-items: center;
-        }
-
-        .floor-button {
-            width: var(--button-size);
-            height: var(--button-size);
-            border-radius: 50%;
-            border: none;
-            background: linear-gradient(145deg, #e6e6e6, #ffffff);
-            box-shadow: 
-                4px 4px 8px rgba(0,0,0,0.3),
-                -4px -4px 8px rgba(255,255,255,0.1);
-            cursor: pointer;
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            transition: all 0.2s;
-        }
-
-        .floor-button:active {
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
-            transform: scale(0.95);
-        }
-
-        .floor-button.active {
-            background: linear-gradient(145deg, #ffd700, #ffec8b);
-        }
     </style>
 </head>
 <body>
-    <div class="elevator-shaft">
-        <div class="elevator">
-            <div class="doors" id="elevator-doors">
-                <div class="door left"></div>
-                <div class="door right"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="elevator-panel">
+    <div class="elevator-container">
         <div class="display-panel">
             <div id="floor-display">G</div>
             <div class="direction-arrows">
@@ -175,21 +164,36 @@
             </div>
         </div>
 
-        <div class="elevator-buttons">
-            <button class="floor-button" onclick="requestFloor(3)">3</button>
-            <button class="floor-button" onclick="requestFloor(2)">2</button>
-            <button class="floor-button" onclick="requestFloor(1)">1</button>
-            <button class="floor-button" onclick="requestFloor(0)">G</button>
+        <div class="elevator-shaft">
+            <div class="elevator">
+                <div class="doors" id="elevator-doors">
+                    <div class="door left"></div>
+                    <div class="door right"></div>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <div class="control-panel">
+        <button class="direction-button" onclick="moveElevator('up')" id="up-button">↑</button>
+        <button class="direction-button" onclick="moveElevator('down')" id="down-button">↓</button>
     </div>
 
     <script>
         let currentFloor = 0;
+        const maxFloor = 5;
         const display = document.getElementById('floor-display');
         const upArrow = document.getElementById('up-arrow');
         const downArrow = document.getElementById('down-arrow');
-        const buttons = document.querySelectorAll('.floor-button');
+        const upButton = document.getElementById('up-button');
+        const downButton = document.getElementById('down-button');
         const doors = document.getElementById('elevator-doors');
+        let isMoving = false;
+
+        function updateButtonStates() {
+            upButton.disabled = isMoving || currentFloor === maxFloor;
+            downButton.disabled = isMoving || currentFloor === 0;
+        }
 
         function openDoors() {
             doors.classList.remove('closed');
@@ -201,40 +205,42 @@
             doors.classList.add('closed');
         }
 
-        function requestFloor(floor) {
-            if (floor === currentFloor) return;
+        function moveElevator(direction) {
+            if (isMoving) return;
+            isMoving = true;
 
-            // Update direction indicators
+            const nextFloor = direction === 'up' ? currentFloor + 1 : currentFloor - 1;
+            if (nextFloor < 0 || nextFloor > maxFloor) return;
+
             upArrow.classList.remove('active');
             downArrow.classList.remove('active');
-            if (floor > currentFloor) {
+            if (direction === 'up') {
                 upArrow.classList.add('active');
             } else {
                 downArrow.classList.add('active');
             }
 
-            // Highlight selected button
-            buttons.forEach(btn => btn.classList.remove('active'));
-            buttons[3 - floor].classList.add('active');
-
-            // Animate elevator sequence
+            updateButtonStates();
             openDoors();
 
             setTimeout(() => {
-                display.textContent = floor === 0 ? 'G' : floor;
+                display.textContent = nextFloor === 0 ? 'G' : nextFloor;
                 
                 setTimeout(() => {
                     closeDoors();
                     
                     setTimeout(() => {
-                        currentFloor = floor;
+                        currentFloor = nextFloor;
                         upArrow.classList.remove('active');
                         downArrow.classList.remove('active');
-                        buttons[3 - floor].classList.remove('active');
+                        isMoving = false;
+                        updateButtonStates();
                     }, 500);
                 }, 1000);
             }, 500);
         }
+
+        updateButtonStates();
     </script>
 </body>
 </html>

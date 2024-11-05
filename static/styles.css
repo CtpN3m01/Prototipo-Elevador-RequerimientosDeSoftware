@@ -20,6 +20,8 @@
     background-color: gray;
     position: absolute;
     transition: width 1s;
+    background-image: url('/static/door.png'); /* Imagen de la puerta */
+    background-size: cover;
 }
 .door.left {
     left: 0;

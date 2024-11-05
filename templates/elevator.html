@@ -18,10 +18,10 @@
                     </div>
                 </div>
                 <div class="buttons mt-4">
-                    <div class="btn btn-secondary m-1" onclick="moveToFloor(3)">3</div>
-                    <div class="btn btn-secondary m-1" onclick="moveToFloor(2)">2</div>
-                    <div class="btn btn-secondary m-1" onclick="moveToFloor(1)">1</div>
                     <div class="btn btn-secondary m-1" onclick="moveToFloor(0)">G</div>
+                    <div class="btn btn-secondary m-1" onclick="moveToFloor(1)">1</div>
+                    <div class="btn btn-secondary m-1" onclick="moveToFloor(2)">2</div>
+                    <div class="btn btn-secondary m-1" onclick="moveToFloor(3)">3</div>
                 </div>
             </div>
         </div>
@@ -31,7 +31,7 @@
         function moveToFloor(floor) {
             const elevator = document.querySelector('.elevator');
             const doors = document.querySelectorAll('.door');
-            const floors = [300, 200, 100, 0]; // Positions for each floor
+            const floors = [0, 100, 200, 300]; // Positions for each floor
 
             // Close doors
             doors.forEach(door => door.style.width = '50%');

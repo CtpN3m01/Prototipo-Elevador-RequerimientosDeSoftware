@@ -6,7 +6,7 @@
     <title>10-Floor Elevator Building</title>
     <style>
         :root {
-            --floor-height: 80px;
+            --floor-height: 120px; /* Increased from 80px */
             --building-width: 600px;
             --elevator-width: 100px;
             --led-color: #ff0000;
@@ -69,11 +69,6 @@
             color: #fff;
             cursor: pointer;
             font-size: 20px;
-            transition: background-color 0.3s;
-        }
-
-        .call-button:hover {
-            background: #95a5a6;
         }
 
         .elevator-shaft {
@@ -87,7 +82,7 @@
 
         .elevator {
             width: calc(var(--elevator-width) - 10px);
-            height: calc(var(--floor-height) - 10px);
+            height: calc(var(--floor-height) - 10px); /* Adjusted to match new floor height */
             position: absolute;
             left: 5px;
             bottom: 5px;
@@ -101,7 +96,6 @@
             height: 100%;
             position: relative;
             overflow: hidden;
-            border-radius: 5px;
         }
 
         .door {
@@ -142,13 +136,37 @@
             </div>
         </div>
 
-        <!-- Regular floors -->
+        <div class="floor" id="floor10">
+            <div class="floor-display">10</div>
+            <div class="call-buttons">
+                <button class="call-button" onclick="callElevator(10, 'down')">↓</button>
+            </div>
+        </div>
+
+        <div class="floor" id="floor9">
+            <div class="floor-display">9</div>
+            <div class="call-buttons">
+                <button class="call-button" onclick="callElevator(9, 'up')">↓</button>
+                <button class="call-button" onclick="callElevator(9, 'down')">↑</button>
+            </div>
+        </div>
+
+        <div class="floor" id="floor8">
+            <div class="floor-display">8</div>
+            <div class="call-buttons">
+                <button class="call-button" onclick="callElevator(8, 'up')">↓</button>
+                <button class="call-button" onclick="callElevator(8, 'down')">↑</button>
+            </div>
+        </div>
+
         <div class="floor" id="floor7">
             <div class="floor-display">7</div>
             <div class="call-buttons">
-                <button class="call-button" onclick="callElevator(7, 'down')">↓</button>
+                <button class="call-button" onclick="callElevator(7, 'up')">↓</button>
+                <button class="call-button" onclick="callElevator(7, 'down')">↑</button>
             </div>
         </div>
+
         <div class="floor" id="floor6">
             <div class="floor-display">6</div>
             <div class="call-buttons">
@@ -156,6 +174,7 @@
                 <button class="call-button" onclick="callElevator(6, 'down')">↑</button>
             </div>
         </div>
+
         <div class="floor" id="floor5">
             <div class="floor-display">5</div>
             <div class="call-buttons">
@@ -163,6 +182,7 @@
                 <button class="call-button" onclick="callElevator(5, 'down')">↑</button>
             </div>
         </div>
+
         <div class="floor" id="floor4">
             <div class="floor-display">4</div>
             <div class="call-buttons">
@@ -170,6 +190,7 @@
                 <button class="call-button" onclick="callElevator(4, 'down')">↑</button>
             </div>
         </div>
+
         <div class="floor" id="floor3">
             <div class="floor-display">3</div>
             <div class="call-buttons">
@@ -177,6 +198,7 @@
                 <button class="call-button" onclick="callElevator(3, 'down')">↑</button>
             </div>
         </div>
+
         <div class="floor" id="floor2">
             <div class="floor-display">2</div>
             <div class="call-buttons">
@@ -184,33 +206,11 @@
                 <button class="call-button" onclick="callElevator(2, 'down')">↑</button>
             </div>
         </div>
+
         <div class="floor" id="floor1">
             <div class="floor-display">1</div>
             <div class="call-buttons">
-                <button class="call-button" onclick="callElevator(1, 'up')">↓</button>
-                <button class="call-button" onclick="callElevator(1, 'down')">↑</button>
-            </div>
-        </div>
-
-        <!-- Sub-levels -->
-        <div class="floor" id="floorS1">
-            <div class="floor-display">S1</div>
-            <div class="call-buttons">
-                <button class="call-button" onclick="callElevator(-1, 'up')">↓</button>
-                <button class="call-button" onclick="callElevator(-1, 'down')">↑</button>
-            </div>
-        </div>
-        <div class="floor" id="floorS2">
-            <div class="floor-display">S2</div>
-            <div class="call-buttons">
-                <button class="call-button" onclick="callElevator(-2, 'up')">↓</button>
-                <button class="call-button" onclick="callElevator(-2, 'down')">↑</button>
-            </div>
-        </div>
-        <div class="floor" id="floorS3">
-            <div class="floor-display">S3</div>
-            <div class="call-buttons">
-                <button class="call-button" onclick="callElevator(-3, 'up')">↓</button>
+                <button class="call-button" onclick="callElevator(1, 'up')">↑</button>
             </div>
         </div>
     </div>
@@ -220,14 +220,16 @@
         let isMoving = false;
         const elevator = document.querySelector('.elevator');
         const doors = document.getElementById('elevator-doors');
-        const floorHeight = 80;
-        const MAX_FLOOR = 7;
-        const MIN_FLOOR = -3;
+        const floorHeight = 120; // Updated to match new CSS floor height
+        const MAX_FLOOR = 10;
+        const MIN_FLOOR = 1;
+        const DOOR_OPERATION_TIME = 500;
+        const FLOOR_WAIT_TIME = 2000;
 
         function updateElevatorPosition(floor) {
             floor = Math.max(MIN_FLOOR, Math.min(floor, MAX_FLOOR));
-            const position = (floor + 3) * floorHeight;
-            const maxPosition = (MAX_FLOOR + 3) * floorHeight;
+            const position = (floor - 1) * floorHeight;
+            const maxPosition = (MAX_FLOOR - 1) * floorHeight;
             const finalPosition = Math.min(position, maxPosition);
             elevator.style.bottom = `${finalPosition}px`;
         }
@@ -240,32 +242,33 @@
             doors.classList.remove('open');
         }
 
-        function getFloorDisplay(floor) {
-            if (floor < 0) return `S${Math.abs(floor)}`;
-            return floor.toString();
-        }
-
         function callElevator(targetFloor, direction) {
             if (targetFloor > MAX_FLOOR || targetFloor < MIN_FLOOR) return;
             if (isMoving || targetFloor === currentFloor) return;
             
             isMoving = true;
-            const actualDirection = direction === 'up' ? 'down' : 'up';
             
-            openDoors();
+            closeDoors();
             
             setTimeout(() => {
                 updateElevatorPosition(targetFloor);
                 
                 setTimeout(() => {
-                    closeDoors();
+                    openDoors();
                     
                     setTimeout(() => {
-                        currentFloor = targetFloor;
-                        isMoving = false;
-                    }, 500);
-                }, 1000);
-            }, 500);
+                        closeDoors();
+                        
+                        setTimeout(() => {
+                            currentFloor = targetFloor;
+                            isMoving = false;
+                        }, DOOR_OPERATION_TIME);
+                        
+                    }, FLOOR_WAIT_TIME);
+                    
+                }, DOOR_OPERATION_TIME);
+                
+            }, DOOR_OPERATION_TIME);
         }
 
         updateElevatorPosition(currentFloor);

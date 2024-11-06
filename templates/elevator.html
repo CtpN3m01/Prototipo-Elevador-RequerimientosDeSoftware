@@ -428,16 +428,33 @@
             const modal = $('#peopleModal');
             modal.data('floor', floor);
             modal.data('direction', direction);
+            // Reset form fields
+            document.getElementById('peopleOut').value = '0';
+            document.getElementById('peopleIn').value = '0';
             modal.modal('show');
+        }
+
+        function resetFloorButton(floor, direction) {
+            const button = document.getElementById(`button-${floor}-${direction}`);
+            if (button) {
+                button.classList.remove('active');
+            }
         }
 
         function submitPeople() {
             const modal = $('#peopleModal');
             const floor = modal.data('floor');
             const direction = modal.data('direction');
-            const peopleOut = parseInt(document.getElementById('peopleOut').value);
-            const peopleIn = parseInt(document.getElementById('peopleIn').value);
             
+            // Reset button state
+            resetFloorButton(floor, direction);
+            
+            // Process people count...
+            const peopleOut = parseInt(document.getElementById('peopleOut').value) || 0;
+            const peopleIn = parseInt(document.getElementById('peopleIn').value) || 0;
+            
+            
+            // Update current people count
             currentPeople = Math.max(0, currentPeople - peopleOut);
             
             if (currentPeople + peopleIn > maxCapacity) {
@@ -448,12 +465,36 @@
                 currentPeople += peopleIn;
             }
             
+            // Update display
+            document.getElementById('peopleCount').textContent = currentPeople;
+            
+            // Reset and close modal
+            document.getElementById('peopleOut').value = '0';
+            document.getElementById('peopleIn').value = '0';
             modal.modal('hide');
-            updatePeopleCount();
-            clearActiveButton(`button-${floor}-${direction}`);
-            isMoving = false;
-            processQueue(); // Process the next call in the queue
+            
+            // Close doors and modal
+            closeDoors();
+            modal.modal('hide');
+            
+            // Continue processing queue
+            processQueue();
         }
+
+        // Add modal cancel handler
+        $('#peopleModal').on('hide.bs.modal', function (e) {
+            const floor = $(this).data('floor');
+            const direction = $(this).data('direction');
+            
+            // Reset button state
+            resetFloorButton(floor, direction);
+            
+            // Close doors
+            closeDoors();
+            
+            // Continue processing queue
+            processQueue();
+        });
 
         // Update initial floor display
         updateFloorDisplays(currentFloor, null);

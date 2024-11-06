@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>10-Floor Elevator Building</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
         :root {
             --floor-height: 120px; /* Increased from 80px */
@@ -146,9 +150,21 @@
             font-size: 14px;
             color: #ecf0f1;
         }
+
+        .people-count {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
+    <div class="people-count" id="peopleCount">Personas en el ascensor: 0</div>
     <div class="building">
         <div class="elevator-shaft">
             <div class="elevator">
@@ -248,10 +264,40 @@
         </div>
     </div>
 
+    <!-- Modal HTML -->
+    <div id="peopleModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Personas en el Piso</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="peopleOut">Personas que bajan:</label>
+                        <input type="number" class="form-control" id="peopleOut" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="peopleIn">Personas que suben:</label>
+                        <input type="number" class="form-control" id="peopleIn" min="0" value="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="submitPeople()">Aceptar</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentFloor = 1;
         let isMoving = false;
         let queue = [];
+        let currentPeople = 0;
+        const maxCapacity = 6;
         const elevator = document.querySelector('.elevator');
         const doors = document.getElementById('elevator-doors');
         const floorHeight = 120; // Updated to match new CSS floor height
@@ -292,6 +338,11 @@
             }
         }
 
+        function updatePeopleCount() {
+            const peopleCountDisplay = document.getElementById('peopleCount');
+            peopleCountDisplay.textContent = `Personas en el ascensor: ${currentPeople}`;
+        }
+
         let activeButtons = [];
 
         function callElevator(targetFloor, direction) {
@@ -317,13 +368,26 @@
         }
 
         function processQueue() {
-            if (queue.length === 0) return;
+            if (queue.length === 0) {
+                isMoving = false;
+                return;
+            }
             
             const nextCall = queue.shift();
+            // Usar currentFloor como punto de partida en lugar de regresar al piso 1
             moveElevator(nextCall.floor, nextCall.direction);
         }
 
+
         function moveElevator(targetFloor, direction) {
+            if (targetFloor === currentFloor) {
+                openDoors();
+                setTimeout(() => {
+                    showPeopleModal(targetFloor, direction);
+                }, FLOOR_WAIT_TIME);
+                return;
+            }
+
             isMoving = true;
             closeDoors();
             
@@ -348,26 +412,53 @@
                     
                     if (progress === 1) {
                         clearInterval(moveInterval);
+                        currentFloor = targetFloor; // Actualizar el piso actual
                         updateFloorDisplays(targetFloor, null);
                         openDoors();
                         
                         setTimeout(() => {
-                            closeDoors();
-                            setTimeout(() => {
-                                currentFloor = targetFloor;
-                                clearActiveButton(`button-${targetFloor}-${direction}`);
-                                isMoving = false;
-                                processQueue(); // Process the next call in the queue
-                            }, DOOR_OPERATION_TIME);
+                            showPeopleModal(targetFloor, direction);
                         }, FLOOR_WAIT_TIME);
                     }
                 }, UPDATE_INTERVAL);
             }, DOOR_OPERATION_TIME);
         }
 
+        function showPeopleModal(floor, direction) {
+            const modal = $('#peopleModal');
+            modal.data('floor', floor);
+            modal.data('direction', direction);
+            modal.modal('show');
+        }
+
+        function submitPeople() {
+            const modal = $('#peopleModal');
+            const floor = modal.data('floor');
+            const direction = modal.data('direction');
+            const peopleOut = parseInt(document.getElementById('peopleOut').value);
+            const peopleIn = parseInt(document.getElementById('peopleIn').value);
+            
+            currentPeople = Math.max(0, currentPeople - peopleOut);
+            
+            if (currentPeople + peopleIn > maxCapacity) {
+                const allowedPeopleIn = maxCapacity - currentPeople;
+                alert(`Subieron ${allowedPeopleIn} personas. ${peopleIn - allowedPeopleIn} personas no pudieron subir porque exceden la capacidad máxima.`);
+                currentPeople = maxCapacity;
+            } else {
+                currentPeople += peopleIn;
+            }
+            
+            modal.modal('hide');
+            updatePeopleCount();
+            clearActiveButton(`button-${floor}-${direction}`);
+            isMoving = false;
+            processQueue(); // Process the next call in the queue
+        }
+
         // Update initial floor display
         updateFloorDisplays(currentFloor, null);
         updateElevatorPosition(currentFloor);
+        updatePeopleCount();
     </script>
 </body>
 </html>

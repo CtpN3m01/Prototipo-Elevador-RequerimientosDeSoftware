@@ -49,6 +49,8 @@
         }
 
         .floor-display {
+            position: absolute;
+            left: calc(50% - var(--elevator-width));
             background: #000;
             color: var(--led-color);
             padding: 5px 10px;
@@ -60,19 +62,26 @@
         }
 
         .call-buttons {
+            position: absolute;
+            left: calc(50% + var(--elevator-width) / 2 + 10px);
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 5px;
         }
 
         .call-button {
-            width: 40px;
-            height: 40px;
+            width: 30px;  /* Made slightly smaller */
+            height: 30px;
             border-radius: 50%;
             border: none;
             background: #7f8c8d;
             color: #fff;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 16px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .call-button.active {
@@ -161,9 +170,106 @@
             border-radius: 5px;
             font-size: 18px;
         }
+
+        .maintenance-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #f1c40f;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .maintenance-button.active {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .maintenance-overlay {
+            display: none;
+            position: absolute;
+            width: var(--elevator-width);
+            height: var(--floor-height);
+            left: 50%;
+            transform: translateX(-50%);
+            background: repeating-linear-gradient(
+                45deg,
+                #f1c40f,
+                #f1c40f 10px,
+                #000000 10px,
+                #000000 20px
+            );
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .maintenance-sign {
+            display: none;
+            position: absolute;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+
+        .maintenance-mode .maintenance-overlay,
+        .maintenance-mode .maintenance-sign {
+            display: block;
+        }
+
+        .maintenance-mode .call-button {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stairs {
+            position: absolute;
+            left: 490px;
+            height: var(--floor-height);
+            width: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            z-index: 1;
+            position: relative; /* Para el posicionamiento del cartel */
+        }
+
+        .stairs-label {
+            position: absolute;
+            top: 50%;
+            left: -70px; 
+            transform: translateY(-50%);
+            color: #ecf0f1;
+            font-size: 12px;
+            background: #34495e;
+            padding: 2px 8px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        .stair-step {
+            height: 15px;
+            background: #95a5a6;
+            border: 1px solid #7f8c8d;
+            margin-left: 0;
+        }
+
+        .stair-step:nth-child(2) { width: 20%; margin-left: 80%; } /* Primer escalón (después del label) */
+        .stair-step:nth-child(3) { width: 40%; margin-left: 60%; }
+        .stair-step:nth-child(4) { width: 60%; margin-left: 40%; }
+        .stair-step:nth-child(5) { width: 80%; margin-left: 20%; }
+        .stair-step:nth-child(6) { width: 100%; margin-left: 0; }
     </style>
 </head>
 <body>
+    <button id="maintenanceButton" class="maintenance-button" onclick="toggleMaintenance()">Modo Mantenimiento</button>
     <div class="people-count" id="peopleCount">Personas en el ascensor: 0</div>
     <div class="building">
         <div class="elevator-shaft">
@@ -176,90 +282,190 @@
         </div>
 
         <div class="floor" id="floor10">
+            <div class="maintenance-overlay"></div>
+            <div class="maintenance-sign">EN MANTENIMIENTO</div>
             <h3 id="PisoText">Piso 10</h3>
             <div class="floor-display">10</div>
             <div class="call-buttons">
                 <button id="button-10-down" class="call-button" data-floor="10" data-direction="down" onclick="callElevator(10, 'down')">↓</button>
             </div>
+            <div class="stairs">
+                <div class="stairs-label">Escaleras</div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+            </div>
         </div>
 
         <div class="floor" id="floor9">
+            <div class="maintenance-overlay"></div>
+            <div class="maintenance-sign">EN MANTENIMIENTO</div>
             <h3 id="PisoText">Piso 9</h3>
             <div class="floor-display">9</div>
             <div class="call-buttons">
                 <button id="button-9-up" class="call-button" data-floor="9" data-direction="up" onclick="callElevator(9, 'up')">↑</button>
                 <button id="button-9-down" class="call-button" data-floor="9" data-direction="down" onclick="callElevator(9, 'down')">↓</button>
             </div>
+            <div class="stairs">
+                <div class="stairs-label">Escaleras</div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+            </div>
         </div>
 
         <div class="floor" id="floor8">
+            <div class="maintenance-overlay"></div>
+            <div class="maintenance-sign">EN MANTENIMIENTO</div>
             <h3 id="PisoText">Piso 8</h3>
             <div class="floor-display">8</div>
             <div class="call-buttons">
                 <button id="button-8-up" class="call-button" data-floor="8" data-direction="up" onclick="callElevator(8, 'up')">↑</button>
                 <button id="button-8-down" class="call-button" data-floor="8" data-direction="down" onclick="callElevator(8, 'down')">↓</button>
             </div>
+            <div class="stairs">
+                <div class="stairs-label">Escaleras</div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+            </div>
         </div>
 
         <div class="floor" id="floor7">
+            <div class="maintenance-overlay"></div>
+            <div class="maintenance-sign">EN MANTENIMIENTO</div>
             <h3 id="PisoText">Piso 7</h3>
             <div class="floor-display">7</div>
             <div class="call-buttons">
                 <button id="button-7-up" class="call-button" data-floor="7" data-direction="up" onclick="callElevator(7, 'up')">↑</button>
                 <button id="button-7-down" class="call-button" data-floor="7" data-direction="down" onclick="callElevator(7, 'down')">↓</button>
             </div>
+            <div class="stairs">
+                <div class="stairs-label">Escaleras</div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+            </div>
         </div>
 
         <div class="floor" id="floor6">
+            <div class="maintenance-overlay"></div>
+            <div class="maintenance-sign">EN MANTENIMIENTO</div>
             <h3 id="PisoText">Piso 6</h3>
             <div class="floor-display">6</div>
             <div class="call-buttons">
                 <button id="button-6-up" class="call-button" data-floor="6" data-direction="up" onclick="callElevator(6, 'up')">↑</button>
                 <button id="button-6-down" class="call-button" data-floor="6" data-direction="down" onclick="callElevator(6, 'down')">↓</button>
             </div>
+            <div class="stairs">
+                <div class="stairs-label">Escaleras</div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+            </div>
         </div>
 
         <div class="floor" id="floor5">
+            <div class="maintenance-overlay"></div>
+            <div class="maintenance-sign">EN MANTENIMIENTO</div>
             <h3 id="PisoText">Piso 5</h3>
             <div class="floor-display">5</div>
             <div class="call-buttons">
                 <button id="button-5-up" class="call-button" data-floor="5" data-direction="up" onclick="callElevator(5, 'up')">↑</button>
                 <button id="button-5-down" class="call-button" data-floor="5" data-direction="down" onclick="callElevator(5, 'down')">↓</button>
             </div>
+            <div class="stairs">
+                <div class="stairs-label">Escaleras</div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+            </div>
         </div>
 
         <div class="floor" id="floor4">
+            <div class="maintenance-overlay"></div>
+            <div class="maintenance-sign">EN MANTENIMIENTO</div>
             <h3 id="PisoText">Piso 4</h3>
             <div class="floor-display">4</div>
             <div class="call-buttons">
                 <button id="button-4-up" class="call-button" data-floor="4" data-direction="up" onclick="callElevator(4, 'up')">↑</button>
                 <button id="button-4-down" class="call-button" data-floor="4" data-direction="down" onclick="callElevator(4, 'down')">↓</button>
             </div>
+            <div class="stairs">
+                <div class="stairs-label">Escaleras</div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+            </div>
         </div>
 
         <div class="floor" id="floor3">
+            <div class="maintenance-overlay"></div>
+            <div class="maintenance-sign">EN MANTENIMIENTO</div>
             <h3 id="PisoText">Piso 3</h3>
             <div class="floor-display">3</div>
             <div class="call-buttons">
                 <button id="button-3-up" class="call-button" data-floor="3" data-direction="up" onclick="callElevator(3, 'up')">↑</button>
                 <button id="button-3-down" class="call-button" data-floor="3" data-direction="down" onclick="callElevator(3, 'down')">↓</button>
             </div>
+            <div class="stairs">
+                <div class="stairs-label">Escaleras</div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+            </div>
         </div>
 
         <div class="floor" id="floor2">
+            <div class="maintenance-overlay"></div>
+            <div class="maintenance-sign">EN MANTENIMIENTO</div>
             <h3 id="PisoText">Piso 2</h3>
             <div class="floor-display">2</div>
             <div class="call-buttons">
                 <button id="button-2-up" class="call-button" data-floor="2" data-direction="up" onclick="callElevator(2, 'up')">↑</button>
                 <button id="button-2-down" class="call-button" data-floor="2" data-direction="down" onclick="callElevator(2, 'down')">↓</button>
             </div>
+            <div class="stairs">
+                <div class="stairs-label">Escaleras</div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+            </div>
         </div>
 
         <div class="floor" id="floor1">
+            <div class="maintenance-overlay"></div>
+            <div class="maintenance-sign">EN MANTENIMIENTO</div>
             <h3 id="PisoText">Piso 1</h3>
             <div class="floor-display">1</div>
             <div class="call-buttons">
                 <button id="button-1-up" class="call-button" data-floor="1" data-direction="up" onclick="callElevator(1, 'up')">↑</button>
+            </div>
+            <div class="stairs">
+                <div class="stairs-label">Escaleras</div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
+                <div class="stair-step"></div>
             </div>
         </div>
     </div>
@@ -344,8 +550,38 @@
         }
 
         let activeButtons = [];
+        let isInMaintenance = false;
+
+        function toggleMaintenance() {
+            if (currentPeople > 0) {
+                alert('No se puede activar el modo mantenimiento mientras haya personas en el elevador.');
+                return;
+            }
+
+            isInMaintenance = !isInMaintenance;
+            const building = document.querySelector('.building');
+            const maintenanceButton = document.getElementById('maintenanceButton');
+            
+            if (isInMaintenance) {
+                building.classList.add('maintenance-mode');
+                maintenanceButton.classList.add('active');
+                // Clear any active calls
+                queue = [];
+                activeButtons.forEach(buttonId => {
+                    clearActiveButton(buttonId);
+                });
+                activeButtons = [];
+            } else {
+                building.classList.remove('maintenance-mode');
+                maintenanceButton.classList.remove('active');
+            }
+        }
 
         function callElevator(targetFloor, direction) {
+            if (isInMaintenance) {
+                alert('El elevador está en mantenimiento. Por favor, use las escaleras o espere a que se complete el mantenimiento.');
+                return;
+            }
             if (targetFloor > MAX_FLOOR || targetFloor < MIN_FLOOR) return;
             if (queue.some(call => call.floor === targetFloor && call.direction === direction)) return;
             
